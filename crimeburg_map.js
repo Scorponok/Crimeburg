@@ -32,6 +32,10 @@ function randomInt(limitLow, limitHigh) {
 function randomPercent() {
     return(randomInt(1,100));
     }
+function randomPercentOfValue(value, lowPercent, highPercent) {
+    var percent = randomInt(lowPercent, highPercent);
+    return(value * percent / 100);
+    }
 function randomRow() {
     return(randomInt(0,numRows));
     }
@@ -112,7 +116,7 @@ function getBuildingTip(row, column) {
         }
 
     text += "Money: $" + building.money + "\n";
-    text += "Value: $" + building.value + "\n";
+    text += "Building Value: $" + building.value + "\n";
     text += "Fear: " + building.fear + "\n";
     text += "Security: " + building.security;
 
@@ -131,6 +135,32 @@ function setBuildingTips() {
         }
     }
 
+function calculateBuildingSecurity(i, j) {
+
+    /* The more scared people are of crime, the more alert they are to it
+    */
+    var security = buildings[i][j].fear;
+
+    /* The closer the police station is, the more secure a building is - if
+        within 1-5 spaces or just on the same street, you get a big bonus
+    */
+    if (j == policeColumn) {
+        security += (difference(i, policeRow) <= 5) ? 50 : 25;
+        }
+
+    /* Within 2 columns, you get a minor bonus
+    */
+    else if (difference(j, policeColumn) <= 2)
+        security += 15;
+
+    /* Within 4, smaller bonus still
+    */
+    else if (difference(j, policeColumn) <= 3)
+        security += 5;
+
+    return(security);
+    }
+
 function calculateInitialBuildingStats() {
     for (var i = 0; i < numRows; i++) {
         for (var j = 0; j < numCols; j++) {
@@ -143,14 +173,10 @@ function calculateInitialBuildingStats() {
 
             /* Start off with some reasonable values
             */
-            buildings[i][j].money = getAverageSalary() * 0.25;
-            buildings[i][j].value = getAverageHouseValue();
+            buildings[i][j].money = randomPercentOfValue(getAverageSalary(), 5, 25);
+            buildings[i][j].value = randomPercentOfValue(getAverageHouseValue(), 50, 150);
             buildings[i][j].fear = getBaselineFear();
-            buildings[i][j].security = 0; // calculate this
-
-            /* Meddle with the cash and property value so they're not all the
-                same
-            */
+            buildings[i][j].security = calculateBuildingSecurity(i, j);
             }
         }
     }
