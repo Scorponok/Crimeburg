@@ -38,88 +38,12 @@ function randomRow() {
 function randomColumn() {
     return(randomInt(0,numCols));
     }
-
-
-
-
-/* Define array of possible buildings and their likelyhoods of appearing
-*/
-var possibleBuildings = [];
-var numClasses = 3;
-
-function addBuildingChance(name, abbrev, peopleLiving, peopleEmployed,
-                            chanceMain, chancePrimary, chanceSecondary,
-                            isLegal, isPolice) {
-    var obj = {
-        name: name,
-        abbrev: abbrev,
-        peopleLiving: peopleLiving,
-        peopleEmployed: peopleEmployed,
-        chance: [chanceMain, chancePrimary, chanceSecondary],
-        isLegal: true,
-        isPolice: false,
-        };
-    obj.isLegal = typeof isLegal !== 'undefined' ? isLegal : true;
-    obj.isPolice = typeof isPolice !== 'undefined' ? isPolice : false;
-    possibleBuildings.push(obj)
+function difference(num1, num2) {
+    return(Math.abs(num1 - num2));
     }
 
-/* Police are never randomly generated, one police station is always assigned
-*/
-addBuildingChance("Police",                 "Pol ", 0,  2,      0,  0,  0, true, true);
-var policeBuilding = possibleBuildings[0];
-
-addBuildingChance("Factory",                "Fact", 0,  40,     0,  0,  5);
-addBuildingChance("Workshop",               "Work", 0,  10,     5,  5,  7);
-addBuildingChance("Warehouse",              "Ware", 0,  15,     0,  5,  10);
-
-addBuildingChance("House",                  "^^^^", 5,  1,      51, 47, 26);
-addBuildingChance("Slum",                   "^ss^", 10, 1,      10, 15, 20);
-addBuildingChance("Grocery Store",          "Groc", 0,  8,      5,  3,  1);
-addBuildingChance("Shop",                   "Shop", 0,  8,      17, 7,  5);
-addBuildingChance("Pharmacy",               "Phar", 0,  8,      5,  3,  1);
-addBuildingChance("Farm",                   "Farm", 10, 25,     0,  5,  5);
-addBuildingChance("Barn",                   "Barn", 0,  5,      0,  2,  10);
-addBuildingChance("Inn",                    "Inn ", 5,  15,     5,  5,  3);
-
-addBuildingChance("Speakeasy",              "Spk ", 0,  8,      1,  1,  1, false);
-addBuildingChance("Gambling Den",           "Gamb", 0,  8,      1,  1,  1, false);
-addBuildingChance("House of Ill Repute",    "Whor", 0,  15,     0,  1,  5, false);
 
 
-/* Verify that buildings add up to 100% on each column
-*/
-function verifyBuildings() {
-    var totals = [0, 0, 0];
-    for (var i = 0; i < possibleBuildings.length; i++) {
-        for (var j = 0; j < numClasses; j++) {
-            totals[j] += possibleBuildings[i].chance[j];
-            }
-        }
-
-    for (var i = 0; i < numClasses; i++) {
-        if (totals[i] != 100) {
-            updateMap("Total for column " + i + " is " + totals[i] + "!");
-            exit();
-            }
-        }
-    }
-verifyBuildings();
-
-/* Define function to randomly generate a building
-*/
-function generateBuilding(type) {
-    var roll = randomPercent();
-    var soFar = 0;
-    for (var i = 0; i < possibleBuildings.length; i++) {
-        soFar += possibleBuildings[i].chance[type];
-        if (soFar >= roll) {
-            return(possibleBuildings[i]);
-            }
-        }
-    updateMap("Couldn't find building on column " + type + " for roll " + roll + "!");
-    exit();
-    }
 
 
 
@@ -156,7 +80,7 @@ for (var i = 0; i < numRows; i++) {
     }
 
 
-/* Choose our buildings
+/* Keep track of various stats about Crimeburg
 */
 var population = 0;
 var employedLegal = 0;
@@ -164,7 +88,7 @@ var employedIllegal = 0;
 var police = 0;
 
 
-/* Someone gets overwritten by the police station!
+/* We always start with a single, understaffed police station
 */
 var buildings = [];
 for (var i = 0; i < numRows; i++) {
@@ -174,15 +98,38 @@ var policeRow = randomRow();
 var policeColumn = randomColumn();
 buildings[policeRow][policeColumn] = policeBuilding;
 
+/* Nothing illegal will set up near the police
+*/
+var policeLimit = 5;
+function isNearPolice(row, column) {
+    return ((difference(row, policeRow) <= policeLimit) &&
+        (difference(column, policeColumn) <= policeLimit))
+        return(true);
+    }
 
+
+/* Choose our buildings
+*/
 for (var i = 0; i < numRows; i++) {
-
     for (var j = 0; j < numCols; j++) {
+
+        /* Make sure we don't overwrite the police station or any other
+            building that's already been placed here
+        */
         if (typeof buildings[i][j] === 'undefined') {
             buildings[i][j] = generateBuilding(streets_lookup[j].type);
+
+            /* If we're near the police, keep generating until we get a legal
+                building
+            */
+            while (!buildings[i][j].isLegal && isNearPolice(i, j)) {
+                buildings[i][j] = generateBuilding(streets_lookup[j].type);
+                }
             }
         var building = buildings[i][j];
 
+        /* Add this building to our demographics
+        */
         population += building.peopleLiving;
         if (building.isLegal)
             employedLegal += building.peopleEmployed;
@@ -192,6 +139,8 @@ for (var i = 0; i < numRows; i++) {
             police += building.peopleEmployed;
             }
 
+        /* Add the building to the map
+        */
         var start = "";
         if (building.isPolice)
             start = "<strong><font color='blue'>";
@@ -203,14 +152,14 @@ for (var i = 0; i < numRows; i++) {
     }
 
 
-/* Render array of arrays into string
+/* Render map array into string
 */
 var rendered = "";
 for (var i = 0; i < map.length; i++) {
     for (var j = 0; j < map[i].length; j++) {
         rendered += map[i][j] + " "
 
-        /* Road!
+        /* Vertical road!
         */
         if ((j + 1) % 2 == 0) {
             rendered += "  ";
@@ -219,7 +168,7 @@ for (var i = 0; i < map.length; i++) {
 
     rendered += "\n";
 
-    /* Road!
+    /* Horizontal road!
     */
     if (i == 5) {
         rendered += "\n";
@@ -229,6 +178,6 @@ for (var i = 0; i < map.length; i++) {
 updateMap(rendered);
 
 
-/* Population info
+/* Update population info
 */
 updatePopulation(population, employedLegal, employedIllegal, police);
