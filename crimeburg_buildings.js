@@ -49,7 +49,7 @@ addBuildingChance("House of Ill Repute",    "Whor", 0,  15,     0,  1,  5, false
 
 /* Verify that buildings add up to 100% on each column
 */
-function verifyBuildings() {
+function verifyBaseBuildings() {
     var totals = [0, 0, 0];
     for (var i = 0; i < possibleBuildings.length; i++) {
         for (var j = 0; j < numClasses; j++) {
@@ -64,7 +64,7 @@ function verifyBuildings() {
             }
         }
     }
-verifyBuildings();
+verifyBaseBuildings();
 
 
 /* Define function to randomly generate a building
