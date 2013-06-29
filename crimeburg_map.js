@@ -131,6 +131,30 @@ function setBuildingTips() {
         }
     }
 
+function calculateInitialBuildingStats() {
+    for (var i = 0; i < numRows; i++) {
+        for (var j = 0; j < numCols; j++) {
+
+            /* We only care about values for robbable buildings
+            */
+            var baseBuilding = buildings[i][j].baseBuilding;
+            if (!baseBuilding.canBeRobbed)
+                continue;
+
+            /* Start off with some reasonable values
+            */
+            buildings[i][j].money = getAverageSalary() * 0.25;
+            buildings[i][j].value = getAverageHouseValue();
+            buildings[i][j].fear = getBaselineFear();
+            buildings[i][j].security = 0; // calculate this
+
+            /* Meddle with the cash and property value so they're not all the
+                same
+            */
+            }
+        }
+    }
+
 
 /* We always start with a single, understaffed police station
 */
@@ -224,7 +248,7 @@ for (var i = 0; i < map.length; i++) {
 
 updateMap(rendered);
 
-
+calculateInitialBuildingStats();
 setBuildingTips();
 
 
