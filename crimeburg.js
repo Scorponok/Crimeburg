@@ -88,15 +88,55 @@ var employedIllegal = 0;
 var police = 0;
 
 
-/* We always start with a single, understaffed police station
-*/
 var buildings = [];
 for (var i = 0; i < numRows; i++) {
     buildings[i] = [];
     }
+
+function setBuilding(row, column, baseBuilding) {
+    buildings[row][column] = {
+        money: 0,
+        fear: 0,
+        value: 0,
+        security: 0,
+        baseBuilding: baseBuilding,
+        };
+    }
+
+function getBuildingTip(row, column) {
+    var text = "";
+    var building = buildings[row][column];
+
+    if (!building.baseBuilding.canBeRobbed) {
+        return("(can't rob this building)");
+        }
+
+    text += "Money: $" + building.money + "\n";
+    text += "Value: $" + building.value + "\n";
+    text += "Fear: " + building.fear + "\n";
+    text += "Security: " + building.security;
+
+    return(text);
+    }
+
+function getBuildingId(row, column) {
+    return("buildingC" + row + "R" + column);
+    }
+
+function setBuildingTips() {
+    for (var i = 0; i < numRows; i++) {
+        for (var j = 0; j < numCols; j++) {
+            $("#" + getBuildingId(i, j)).prop("title", getBuildingTip(i, j));
+            }
+        }
+    }
+
+
+/* We always start with a single, understaffed police station
+*/
 var policeRow = randomRow();
 var policeColumn = randomColumn();
-buildings[policeRow][policeColumn] = policeBuilding;
+setBuilding(policeRow, policeColumn, policeBuilding);
 
 /* Nothing illegal will set up near the police
 */
@@ -117,16 +157,18 @@ for (var i = 0; i < numRows; i++) {
             building that's already been placed here
         */
         if (typeof buildings[i][j] === 'undefined') {
-            buildings[i][j] = generateBuilding(streets_lookup[j].type);
+            var baseBuilding = generateBuilding(streets_lookup[j].type);
 
             /* If we're near the police, keep generating until we get a legal
                 building
             */
-            while (!buildings[i][j].isLegal && isNearPolice(i, j)) {
-                buildings[i][j] = generateBuilding(streets_lookup[j].type);
+            while (!baseBuilding.isLegal && isNearPolice(i, j)) {
+                baseBuilding = generateBuilding(streets_lookup[j].type);
                 }
+
+            setBuilding(i, j, baseBuilding);
             }
-        var building = buildings[i][j];
+        var building = buildings[i][j].baseBuilding;
 
         /* Add this building to our demographics
         */
@@ -139,7 +181,7 @@ for (var i = 0; i < numRows; i++) {
             police += building.peopleEmployed;
             }
 
-        /* Add the building to the map
+        /* Appropriate formatting
         */
         var start = "";
         if (building.isPolice)
@@ -147,7 +189,12 @@ for (var i = 0; i < numRows; i++) {
         else if (!building.isLegal)
             start = "<strong><font color='red'>";
         var end = (building.isLegal && !building.isPolice) ? "" : "</font></strong>";;
-        map[i][j] = start + building.abbrev + end;
+
+        /* Add the building to the map
+        */
+        map[i][j] = "<span id='" + getBuildingId(i, j) + "' title='???'>";
+        map[i][j] += start + building.abbrev + end;
+        map[i][j] += "</span>";
         }
     }
 
@@ -176,6 +223,9 @@ for (var i = 0; i < map.length; i++) {
     }
 
 updateMap(rendered);
+
+
+setBuildingTips();
 
 
 /* Update population info

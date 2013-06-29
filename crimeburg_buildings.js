@@ -16,6 +16,7 @@ function addBuildingChance(name, abbrev, peopleLiving, peopleEmployed,
         chance: [chanceMain, chancePrimary, chanceSecondary],
         isLegal: true,
         isPolice: false,
+        canBeRobbed: (name === "House") ? true : false,
         };
     obj.isLegal = typeof isLegal !== 'undefined' ? isLegal : true;
     obj.isPolice = typeof isPolice !== 'undefined' ? isPolice : false;
@@ -32,8 +33,8 @@ addBuildingChance("Factory",                "Fact", 0,  40,     0,  0,  5);
 addBuildingChance("Workshop",               "Work", 0,  10,     5,  5,  7);
 addBuildingChance("Warehouse",              "Ware", 0,  15,     0,  5,  10);
 
-addBuildingChance("House",                  "^^^^", 5,  1,      51, 47, 26);
-addBuildingChance("Slum",                   "^ss^", 10, 1,      10, 15, 20);
+addBuildingChance("House",                  "_^^_", 5,  1,      51, 47, 26);
+addBuildingChance("Slum",                   "Slum", 10, 1,      10, 15, 20);
 addBuildingChance("Grocery Store",          "Groc", 0,  8,      5,  3,  1);
 addBuildingChance("Shop",                   "Shop", 0,  8,      17, 7,  5);
 addBuildingChance("Pharmacy",               "Phar", 0,  8,      5,  3,  1);
