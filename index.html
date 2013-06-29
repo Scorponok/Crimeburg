@@ -10,13 +10,17 @@
 
 <h1>Crimeburg - 1919</h1>
 
-<p>Your Money: $<span id="money">$$$</span></p>
+<p>Your Money: <span id="money">$$$</span></p>
 
 <pre id="map">shh</pre>
 
 <button onclick="nextMonth();">Next Month</button>
 
 <p>Demographics: <span id="population">???</span></p>
+
+<div id="overlay" style="display: none; position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; z-index: 1000;">
+  <div id="popup" style="position: absolute; left: 100px; top: 100px; border: solid black 1px; padding: 10px; background-color: white;">hello</div>
+  </div>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
 <!-- if needed

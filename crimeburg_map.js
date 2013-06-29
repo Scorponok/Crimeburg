@@ -50,7 +50,6 @@ function difference(num1, num2) {
 
 
 
-
 /* Define the streets and the classes of buildings on each
 */
 var streets = []
@@ -103,7 +102,36 @@ function setBuilding(row, column, baseBuilding) {
         fear: 0,
         value: 0,
         security: 0,
+        row: row,
+        column: column,
         baseBuilding: baseBuilding,
+
+        calculateSecurity: function() {
+
+            /* The more scared people are of crime, the more alert they are to it
+            */
+            var newSecurity = this.fear;
+
+            /* The closer the police station is, the more secure a building is - if
+                within 1-5 spaces or just on the same street, you get a big bonus
+            */
+            if (this.column == policeColumn) {
+                newSecurity += (difference(this.row, policeRow) <= 5) ? 50 : 25;
+                }
+
+            /* Within 2 columns, you get a minor bonus
+            */
+            else if (difference(this.column, policeColumn) <= 2)
+                newSecurity += 15;
+
+            /* Within 4, smaller bonus still
+            */
+            else if (difference(this.column, policeColumn) <= 3)
+                newSecurity += 5;
+
+            this.security = newSecurity;
+            }
+
         };
     }
 
@@ -115,8 +143,8 @@ function getBuildingTip(row, column) {
         return("(can't rob this building)");
         }
 
-    text += "Money: $" + building.money + "\n";
-    text += "Building Value: $" + building.value + "\n";
+    text += "Money: " + formatMoney(building.money) + "\n";
+    text += "Building Value: " + formatMoney(building.value) + "\n";
     text += "Fear: " + building.fear + "\n";
     text += "Security: " + building.security;
 
@@ -135,32 +163,6 @@ function setBuildingTips() {
         }
     }
 
-function calculateBuildingSecurity(i, j) {
-
-    /* The more scared people are of crime, the more alert they are to it
-    */
-    var security = buildings[i][j].fear;
-
-    /* The closer the police station is, the more secure a building is - if
-        within 1-5 spaces or just on the same street, you get a big bonus
-    */
-    if (j == policeColumn) {
-        security += (difference(i, policeRow) <= 5) ? 50 : 25;
-        }
-
-    /* Within 2 columns, you get a minor bonus
-    */
-    else if (difference(j, policeColumn) <= 2)
-        security += 15;
-
-    /* Within 4, smaller bonus still
-    */
-    else if (difference(j, policeColumn) <= 3)
-        security += 5;
-
-    return(security);
-    }
-
 function calculateInitialBuildingStats() {
     for (var i = 0; i < numRows; i++) {
         for (var j = 0; j < numCols; j++) {
@@ -176,7 +178,7 @@ function calculateInitialBuildingStats() {
             buildings[i][j].money = randomPercentOfValue(getAverageSalary(), 5, 25);
             buildings[i][j].value = randomPercentOfValue(getAverageHouseValue(), 50, 150);
             buildings[i][j].fear = getBaselineFear();
-            buildings[i][j].security = calculateBuildingSecurity(i, j);
+            buildings[i][j].calculateSecurity();
             }
         }
     }
@@ -242,7 +244,7 @@ for (var i = 0; i < numRows; i++) {
 
         /* Add the building to the map
         */
-        map[i][j] = "<span id='" + getBuildingId(i, j) + "' title='???'>";
+        map[i][j] = "<span id='" + getBuildingId(i, j) + "' title='???' onclick='showBuildingMenu(event, " + i + ", " + j + ");'>";
         map[i][j] += start + building.abbrev + end;
         map[i][j] += "</span>";
         }
@@ -281,3 +283,35 @@ setBuildingTips();
 /* Update population info
 */
 updatePopulation(population, employedLegal, employedIllegal, police);
+
+
+function showBuildingMenu(event, i, j) {
+
+    var popup = $("#popup");
+    var overlay = $("#overlay");
+
+    /* Build up the content we want to show in the popup
+    */
+    if (buildings[i][j].baseBuilding.canBeRobbed) {
+        popup.html("<button onclick='robBuilding(" + i + ", " + j + ");'>Rob House</button>");
+        }
+    else {
+        popup.html("<font color='grey'>(can't do anything with this building)</font>");
+        }
+
+    /* Position appropriately
+    */
+    var x = event.pageX - 25;
+    var y = event.pageY + 25;
+    $("#popup").css({
+        left: x + "px",
+        top: y + "px",
+        });
+    overlay.show();
+
+    /* Make sure we go away if clicked
+    */
+    overlay.click(function() {
+        overlay.hide();
+        });
+    }
