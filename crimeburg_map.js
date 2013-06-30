@@ -94,13 +94,6 @@ var map = new function(global) {
         })();
 
 
-    /* Define array of empty arrays to hold map
-    */
-    var _map = [];
-    for (var i = 0; i < numRows; i++) {
-        _map[i] = [];
-        }
-
     /* Keep track of various stats about Crimeburg
     */
     var _population = 0;
@@ -167,6 +160,27 @@ var map = new function(global) {
                     }
                 return(3);
                 },
+
+            rob: function(stolen) {
+
+                /* Robbing someone adds a significant chunk of fear and drops
+                    the level by 1 (to a minimum of 0)
+                */
+                this.fear += 50;
+                this.level -= 1;
+                this.level = Math.max(1, this.level);
+
+                /* Also you lose money
+                */
+                this.money -= stolen;
+                this.money = Math.max(0, this.money);
+
+                /* Update the building tooltips after messing with them
+                */
+                this.calculateSecurity();
+                renderMap();
+                map.setBuildingTips();
+                }
 
             };
         }
@@ -254,8 +268,7 @@ var map = new function(global) {
 
                 setBuilding(i, j, baseBuilding, _streets_lookup[j].levelBonus);
                 }
-            var building = _buildings[i][j];
-            var baseBuilding = building.baseBuilding;
+            var baseBuilding = _buildings[i][j].baseBuilding;
 
             /* Add this building to our demographics
             */
@@ -267,39 +280,50 @@ var map = new function(global) {
             if (baseBuilding.isPolice) {
                 _police += baseBuilding.peopleEmployed;
                 }
-
-            /* Appropriate formatting
-            */
-            var style = "";
-            if (baseBuilding.isPolice) {
-                style += "color: blue; ";
-                }
-            else if (!baseBuilding.isLegal) {
-                style += "color: red; ";
-                }
-            if (building.getRank() <= 1) {
-                style += "font-weight: lighter; ";
-                }
-            else if (building.getRank() >= 3) {
-                style += "font-weight: bolder; ";
-                }
-
-            /* Add the building to the map
-            */
-            _map[i][j] = "<span id='" + getBuildingId(i, j) + "' title='???' style='" + style + "'"
-            _map[i][j] += "onclick='map.showBuildingMenu(event, " + i + ", " + j + ");'>";
-            _map[i][j] += baseBuilding.abbrev + "</span>";
             }
         }
 
 
     /* Render map array into string
     */
-    (function() {
+    function renderMap() {
         var rendered = "";
-        for (var i = 0; i < _map.length; i++) {
-            for (var j = 0; j < _map[i].length; j++) {
-                rendered += _map[i][j] + " "
+
+        /* Define array of empty arrays to hold map
+        */
+        var map = [];
+        for (var i = 0; i < numRows; i++) {
+            map[i] = [];
+            }
+
+        for (var i = 0; i < numRows; i++) {
+            for (var j = 0; j < numCols; j++) {
+                var building = _buildings[i][j];
+                var baseBuilding = building.baseBuilding;
+
+                /* Appropriate formatting
+                */
+                var style = "";
+                if (baseBuilding.isPolice) {
+                    style += "color: blue; ";
+                    }
+                else if (!baseBuilding.isLegal) {
+                    style += "color: red; ";
+                    }
+                if (building.getRank() <= 1) {
+                    style += "font-weight: lighter; ";
+                    }
+                else if (building.getRank() >= 3) {
+                    style += "font-weight: bolder; ";
+                    }
+
+                /* Add the building to the map
+                */
+                map[i][j] = "<span id='" + getBuildingId(i, j) + "' title='???' style='" + style + "'"
+                map[i][j] += "onclick='map.showBuildingMenu(event, " + i + ", " + j + ");'>";
+                map[i][j] += baseBuilding.abbrev + "</span>";
+
+                rendered += map[i][j] + " "
 
                 /* Vertical road!
                 */
@@ -317,7 +341,8 @@ var map = new function(global) {
                 }
             }
         updateMap(rendered);
-        })();
+        }
+    renderMap();
 
     /* Set up our buildings now they've been chosen
         NOTE: We have to wait until the HTML has been rendered to set the tips

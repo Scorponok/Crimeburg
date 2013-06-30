@@ -19,20 +19,12 @@ var game = new function() {
             return;
             }
 
-        /* Robbing someone adds a significant chunk of fear
-        */
-        building.fear += 50;
-
         /* You get 25-100% of money
         */
         var moneyStolen = randomPercentOfValue(building.money, 25, 100);
-        building.money -= moneyStolen;
         player.earnMoney(moneyStolen);
         alert("You stole " + formatMoney(moneyStolen) + " from those poor people.");
 
-        /* Update the building tooltips after messing with them
-        */
-        building.calculateSecurity();
-        map.setBuildingTips();
+        building.rob(moneyStolen);
         }
     };
