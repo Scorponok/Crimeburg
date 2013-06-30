@@ -8,7 +8,7 @@
         assigned
     */
     global.getPoliceBuilding = function() {
-        return(policeBuilding);
+        return(_policeBuilding);
         }
 
     /* Randomly pick a building for a particular class of street
@@ -16,10 +16,10 @@
     global.generateBuilding = function(type) {
         var roll = randomPercent();
         var soFar = 0;
-        for (var i = 0; i < possibleBuildings.length; i++) {
-            soFar += possibleBuildings[i].chance[type];
+        for (var i = 0; i < _possibleBuildings.length; i++) {
+            soFar += _possibleBuildings[i].chance[type];
             if (soFar >= roll) {
-                return(possibleBuildings[i]);
+                return(_possibleBuildings[i]);
                 }
             }
         updateMap("Couldn't find building on column " + type + " for roll " + roll + "!");
@@ -32,7 +32,7 @@
     /* Define array of possible buildings and a function to add a building to
         the array
     */
-    var possibleBuildings = [];
+    var _possibleBuildings = [];
     function registerBuilding(name, abbrev, peopleLiving, peopleEmployed,
                                 chanceMain, chancePrimary, chanceSecondary,
                                 isLegal, isPolice) {
@@ -48,7 +48,7 @@
             };
         obj.isLegal = typeof isLegal !== 'undefined' ? isLegal : true;
         obj.isPolice = typeof isPolice !== 'undefined' ? isPolice : false;
-        possibleBuildings.push(obj)
+        _possibleBuildings.push(obj)
         }
 
     /* Verify that building chances add up to 100% on each column - call this
@@ -56,9 +56,9 @@
     */
     function verifyBaseBuildings() {
         var totals = [0, 0, 0];
-        for (var i = 0; i < possibleBuildings.length; i++) {
+        for (var i = 0; i < _possibleBuildings.length; i++) {
             for (var j = 0; j < numClasses; j++) {
-                totals[j] += possibleBuildings[i].chance[j];
+                totals[j] += _possibleBuildings[i].chance[j];
                 }
             }
 
@@ -74,7 +74,7 @@
     /* Police are never randomly generated, one police station is always assigned
     */
     registerBuilding("Police",                 "Pol ", 0,  2,      0,  0,  0, true, true);
-    var policeBuilding = possibleBuildings[0];
+    var _policeBuilding = _possibleBuildings[0];
 
     /* All other buildings have a certain chance to be generated in each street
         type

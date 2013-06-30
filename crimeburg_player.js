@@ -1,57 +1,58 @@
 "use strict";
 
-var player = {
-    money: 500,
-    hasLost: false,
-    };
+var player = new function() {
 
-function isBroke() {
-    return(player.money <= 0);
-    }
+//Public
 
-function formatMoney(money) {
-    return("$" + money.toFixed(2));
-    }
-
-function changeMoney(amount) {
-    player.money += amount;
-
-    if (isBroke())
-        player.hasLost = true;
-
-    updateMoneyLabel();
-    }
-
-function spendMoney(money) {
-    changeMoney(-money);
-    }
-
-function earnMoney(money) {
-    changeMoney(money);
-    }
-
-function spendMonthly() {
-    var outgoings = Math.max(100, player.money * 0.2);
-    spendMoney(outgoings);
-    }
-
-function updateMoneyLabel() {
-    var money = player.money < 0 ? 0 : player.money;
-    var text = formatMoney(money);
-    if (hasLost()) {
-        text += " <strong><font color='red'>Sorry, you lost!</font></strong>";
+    this.spendMoney = function(amount) {
+        changeMoney(-amount);
         }
-    $("#money").html(text);
-    }
 
-function hasLost() {
-    return(player.hasLost);
-    }
+    this.earnMoney = function(amount) {
+        changeMoney(amount);
+        }
 
-/* Getting caught means you're fined half your cash
-*/
-function getFine() {
-    return(Math.max(player.money / 2, 250));
-    }
+    this.spendMonthly = function() {
+        var outgoings = Math.max(100, _money * 0.2);
+        spendMoney(outgoings);
+        }
 
-updateMoneyLabel();
+    /* Getting caught means you're fined half your cash
+    */
+    this.getFine = function() {
+        return(Math.max(_money / 2, 250));
+        }
+
+
+//Private
+
+    function isBroke() {
+        return(_money <= 0);
+        }
+
+    function changeMoney(amount) {
+        _money += amount;
+
+        if (isBroke())
+            _hasLost = true;
+
+        updateMoneyLabel();
+        }
+
+    function updateMoneyLabel() {
+        var amount = _money < 0 ? 0 : _money;
+        var text = formatMoney(amount);
+        if (_hasLost) {
+            text += " <strong><font color='red'>Sorry, you lost!</font></strong>";
+            }
+        $("#money").html(text);
+        }
+
+
+    var _money = 500;
+    var _hasLost = false;
+
+    /* Update our money label to the starting state
+    */
+    updateMoneyLabel();
+    };

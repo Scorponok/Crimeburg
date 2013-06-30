@@ -1,7 +1,7 @@
 "use strict";
 
 function nextMonth() {
-    spendMonthly();
+    player.spendMonthly();
     }
 
 function robBuilding(i, j) {
@@ -11,8 +11,8 @@ function robBuilding(i, j) {
     */
     var roll = randomPercent();
     if (roll <= building.security) {
-        var fine = getFine();
-        spendMoney(fine);
+        var fine = player.getFine();
+        player.spendMoney(fine);
         alert("You got caught! You were fined " + formatMoney(fine) + ".");
         return;
         }
@@ -25,7 +25,7 @@ function robBuilding(i, j) {
     */
     var moneyStolen = randomPercentOfValue(building.money, 25, 100);
     building.money -= moneyStolen;
-    earnMoney(moneyStolen);
+    player.earnMoney(moneyStolen);
     alert("You stole " + formatMoney(moneyStolen) + " from those poor people.");
 
     /* Update the building tooltips after messing with them
