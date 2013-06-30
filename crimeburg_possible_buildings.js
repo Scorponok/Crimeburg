@@ -98,4 +98,4 @@
 
     verifyBaseBuildings();
 
-})(this);
+    })(this);

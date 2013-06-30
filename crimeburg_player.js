@@ -14,7 +14,7 @@ var player = new function() {
 
     this.spendMonthly = function() {
         var outgoings = Math.max(100, _money * 0.2);
-        spendMoney(outgoings);
+        this.spendMoney(outgoings);
         }
 
     /* Getting caught means you're fined half your cash

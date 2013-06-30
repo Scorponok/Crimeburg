@@ -27,7 +27,7 @@ function getBaselineFear() {
 /* Helpful functions
 */
 function randomInt(limitLow, limitHigh) {
-    return(Math.floor(Math.random() * limitHigh) + limitLow);
+    return(Math.floor(Math.random() * (limitHigh - limitLow)) + limitLow);
     }
 function randomPercent() {
     return(randomInt(1,100));
