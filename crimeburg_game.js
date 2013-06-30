@@ -5,7 +5,6 @@ function nextMonth() {
     }
 
 function robBuilding(i, j) {
-
     var building = buildings[i][j];
 
     /* The security rating is our chance to be caught

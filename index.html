@@ -8,31 +8,27 @@
 
 <body>
 
-<h1>Crimeburg - 1919</h1>
+<h1>Crimeburg - January 1919</h1>
 
-<p>Your Money: <span id="money">$$$</span></p>
+<p>Your Money: <span id="money">money goes here</span></p>
 
-<pre id="map">shh</pre>
+<pre id="map">map goes here</pre>
 
 <button onclick="nextMonth();">Next Month</button>
 
-<p>Demographics: <span id="population">???</span></p>
+<p>Demographics: <span id="population">population goes here</span></p>
 
+<!-- Singleton modal popup window -->
 <div id="overlay" style="display: none; position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; z-index: 1000;">
-  <div id="popup" style="position: absolute; left: 100px; top: 100px; border: solid black 1px; padding: 10px; background-color: white;">hello</div>
+  <div id="popup" style="position: absolute; left: 100px; top: 100px; border: solid black 1px; padding: 10px; background-color: white;">popup window contents go here</div>
   </div>
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
-<!-- if needed
-<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-<script>
-  /* Get tooltips ready for use
-  */
-  $(document).tooltip();
-  </script>-->
+<!-- Hosting your own jquery is for suckas -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
 
-<script src="crimeburg_stats.js"></script>
-<script src="crimeburg_buildings.js"></script>
+<!-- The actual game -->
+<script src="crimeburg_core.js"></script>
+<script src="crimeburg_possible_buildings.js"></script>
 <script src="crimeburg_player.js"></script>
 <script src="crimeburg_map.js"></script>
 <script src="crimeburg_game.js"></script>

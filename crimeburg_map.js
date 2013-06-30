@@ -13,43 +13,6 @@ updateMap("generating Crimeburg...");
 
 
 
-/* Define the classes of street
-*/
-var classMain = 0;
-var classPrimary = 1;
-var classSecondary = 2;
-
-var numRows = 12;
-var numCols = 12;
-
-
-
-/* Helpful functions
-*/
-function randomInt(limitLow, limitHigh) {
-    return(Math.floor(Math.random() * limitHigh) + limitLow);
-    }
-function randomPercent() {
-    return(randomInt(1,100));
-    }
-function randomPercentOfValue(value, lowPercent, highPercent) {
-    var percent = randomInt(lowPercent, highPercent);
-    return(value * percent / 100);
-    }
-function randomRow() {
-    return(randomInt(0,numRows));
-    }
-function randomColumn() {
-    return(randomInt(0,numCols));
-    }
-function difference(num1, num2) {
-    return(Math.abs(num1 - num2));
-    }
-
-
-
-
-
 /* Define the streets and the classes of buildings on each
 */
 var streets = []
@@ -188,7 +151,7 @@ function calculateInitialBuildingStats() {
 */
 var policeRow = randomRow();
 var policeColumn = randomColumn();
-setBuilding(policeRow, policeColumn, policeBuilding);
+setBuilding(policeRow, policeColumn, getPoliceBuilding());
 
 /* Nothing illegal will set up near the police
 */
