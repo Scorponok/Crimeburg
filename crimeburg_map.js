@@ -70,20 +70,21 @@ var map = new function(global) {
     var _streets_lookup = [];
     (function() {
         var streets = []
-        function addStreet(name, type) {
+        function addStreet(name, type, levelBonus) {
             var obj = {
                 name: name,
                 type: type,
+                levelBonus: levelBonus,
                 };
             streets.push(obj);
             }
-        addStreet("Town Limits", classSecondary);
-        addStreet("B Street", classSecondary);
-        addStreet("A Street", classPrimary);
-        addStreet("Main Street", classMain);
-        addStreet("1st Street", classPrimary);
-        addStreet("2nd Street", classSecondary);
-        addStreet("Town Limits", classSecondary);
+        addStreet("Town Limits", classSecondary, 0);
+        addStreet("B Street", classSecondary, 2);
+        addStreet("A Street", classPrimary, 4);
+        addStreet("Main Street", classMain, 6);
+        addStreet("1st Street", classPrimary, 4);
+        addStreet("2nd Street", classSecondary, 2);
+        addStreet("Town Limits", classSecondary, 0);
 
         /* Define the streets used to generate each column
         */
@@ -116,12 +117,13 @@ var map = new function(global) {
 
     /* Initialize a building spot with a building
     */
-    function setBuilding(row, column, baseBuilding) {
+    function setBuilding(row, column, baseBuilding, levelBonus) {
         _buildings[row][column] = {
             money: 0,
             fear: 0,
             value: 0,
             security: 0,
+            level: levelBonus + randomInt(1, 6),
             row: row,
             column: column,
             baseBuilding: baseBuilding,
@@ -150,7 +152,21 @@ var map = new function(global) {
                     newSecurity += 5;
 
                 this.security = newSecurity;
-                }
+                },
+
+            levelName: function() {
+                return(baseBuilding.nameForRank(this.getRank()));
+                },
+
+            getRank: function() {
+                if (this.level <= 4) {
+                    return(1);
+                    }
+                if (this.level <= 8) {
+                    return(2);
+                    }
+                return(3);
+                },
 
             };
         }
@@ -158,17 +174,19 @@ var map = new function(global) {
     /* Generate tooltip for a building
     */
     function getBuildingTip(row, column) {
-        var text = "";
         var building = _buildings[row][column];
 
+        var text = building.levelName();
+        text += "\n\nLevel: " + building.level;
+
         if (!building.baseBuilding.canBeRobbed) {
-            return("(can't rob this building)");
+            return(text);
             }
 
-        text += "Money: " + formatMoney(building.money) + "\n";
-        text += "Building Value: " + formatMoney(building.value) + "\n";
-        text += "Fear: " + building.fear + "\n";
-        text += "Security: " + building.security;
+        text += "\nMoney: " + formatMoney(building.money);
+        text += "\nBuilding Value: " + formatMoney(building.value);
+        text += "\nFear: " + building.fear;
+        text += "\nSecurity: " + building.security;
 
         return(text);
         }
@@ -204,7 +222,7 @@ var map = new function(global) {
     */
     var _policeRow = randomRow();
     var _policeColumn = randomColumn();
-    setBuilding(_policeRow, _policeColumn, getPoliceBuilding());
+    setBuilding(_policeRow, _policeColumn, getPoliceBuilding(), _streets_lookup[_policeColumn].levelBonus);
 
     /* Nothing illegal will set up near the police
     */
@@ -234,35 +252,43 @@ var map = new function(global) {
                     baseBuilding = generateBuilding(_streets_lookup[j].type);
                     }
 
-                setBuilding(i, j, baseBuilding);
+                setBuilding(i, j, baseBuilding, _streets_lookup[j].levelBonus);
                 }
-            var building = _buildings[i][j].baseBuilding;
+            var building = _buildings[i][j];
+            var baseBuilding = building.baseBuilding;
 
             /* Add this building to our demographics
             */
-            _population += building.peopleLiving;
-            if (building.isLegal)
-                _employedLegal += building.peopleEmployed;
+            _population += baseBuilding.peopleLiving;
+            if (baseBuilding.isLegal)
+                _employedLegal += baseBuilding.peopleEmployed;
             else
-                _employedIllegal += building.peopleEmployed;
-            if (building.isPolice) {
-                _police += building.peopleEmployed;
+                _employedIllegal += baseBuilding.peopleEmployed;
+            if (baseBuilding.isPolice) {
+                _police += baseBuilding.peopleEmployed;
                 }
 
             /* Appropriate formatting
             */
-            var start = "";
-            if (building.isPolice)
-                start = "<strong><font color='blue'>";
-            else if (!building.isLegal)
-                start = "<strong><font color='red'>";
-            var end = (building.isLegal && !building.isPolice) ? "" : "</font></strong>";;
+            var style = "";
+            if (baseBuilding.isPolice) {
+                style += "color: blue; ";
+                }
+            else if (!baseBuilding.isLegal) {
+                style += "color: red; ";
+                }
+            if (building.getRank() <= 1) {
+                style += "font-weight: lighter; ";
+                }
+            else if (building.getRank() >= 3) {
+                style += "font-weight: bolder; ";
+                }
 
             /* Add the building to the map
             */
-            _map[i][j] = "<span id='" + getBuildingId(i, j) + "' title='???' onclick='map.showBuildingMenu(event, " + i + ", " + j + ");'>";
-            _map[i][j] += start + building.abbrev + end;
-            _map[i][j] += "</span>";
+            _map[i][j] = "<span id='" + getBuildingId(i, j) + "' title='???' style='" + style + "'"
+            _map[i][j] += "onclick='map.showBuildingMenu(event, " + i + ", " + j + ");'>";
+            _map[i][j] += baseBuilding.abbrev + "</span>";
             }
         }
 

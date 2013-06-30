@@ -51,7 +51,6 @@ function formatMoney(amount) {
     return("$" + amount.toFixed(2));
     }
 
-
-
-
-
+function reportError(text) {
+    alert(text);
+    }
