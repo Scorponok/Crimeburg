@@ -33,12 +33,12 @@
         the array
     */
     var _possibleBuildings = [];
-    function registerBuilding(name, abbrev, levels, peopleLiving, peopleEmployed,
+    function registerBuilding(name, abbrevs, levels, peopleLiving, peopleEmployed,
                                 chanceMain, chancePrimary, chanceSecondary,
                                 isLegal, isPolice) {
         var obj = {
             name: name,
-            abbrev: abbrev,
+            abbrevs: abbrevs,
             levels: levels,
             peopleLiving: peopleLiving,
             peopleEmployed: peopleEmployed,
@@ -49,6 +49,9 @@
 
             nameForRank: function(rank) {
                 return(levels[rank-1]);
+                },
+            abbrevForRank: function(rank) {
+                return(abbrevs[rank-1]);
                 },
             };
         obj.isLegal = typeof isLegal !== 'undefined' ? isLegal : true;
@@ -78,40 +81,40 @@
 
     /* Police are never randomly generated, one police station is always assigned
     */
-    registerBuilding("Police", "Pol ", ["Deputy", "Sheriff", "Police"],
+    registerBuilding("Police", [" o  ", " oO ", "OoOO"], ["Deputy", "Sheriff", "Police"],
         0,  2,      0,  0,  0, true, true);
     var _policeBuilding = _possibleBuildings[0];
 
     /* All other buildings have a certain chance to be generated in each street
         type
     */
-    registerBuilding("Factory", "Fact", ["Sweatshop", "Factory", "Foundry"],
+    registerBuilding("Factory", [" f  ", " fF ", "FfFF"], ["Sweatshop", "Factory", "Foundry"],
         0,  40,     0,  0,  5);
-    registerBuilding("Workshop", "Work", ["Mill", "Workshop", "Studio"],
+    registerBuilding("Workshop", [" k  ", " kK ", "KkKK"], ["Mill", "Workshop", "Studio"],
         0,  10,     5,  5,  7);
-    registerBuilding("Warehouse", "Ware", ["Yard", "Warehouse", "Depot"],
+    registerBuilding("Warehouse", [" w  ", " wW ", "WwWW"], ["Yard", "Warehouse", "Depot"],
         0,  15,     0,  5,  10);
 
-    registerBuilding("House", "_^^_", ["Slum", "House", "Mansion"],
+    registerBuilding("House", [" ^  ", " ^^ ", "^^^^"], ["Slum", "House", "Mansion"],
         5,  1,      61, 62, 46);
-    registerBuilding("Grocery Store", "Groc", ["Fruit Stand", "Grocery", "Supermarket"],
+    registerBuilding("Grocery Store", [" g  ", " gG ", "GgGG"], ["Fruit Stand", "Grocery", "Supermarket"],
         0,  8,      5,  3,  1);
-    registerBuilding("Shop", "Shop", ["Five-and-dime", "Shop", "Store"],
+    registerBuilding("Shop", [" s  ", " sS ", "SsSS"], ["Five-and-dime", "Shop", "Store"],
         0,  8,      17, 7,  5);
-    registerBuilding("Pharmacy", "Phar", ["Herbalist", "Pharmacy", "Druggist"],
+    registerBuilding("Pharmacy", [" p  ", " pP ", "PpPP"], ["Herbalist", "Pharmacy", "Druggist"],
         0,  8,      5,  3,  1);
-    registerBuilding("Farm", "Farm", ["Freehold", "Farm", "Ranch"],
+    registerBuilding("Farm", [" a  ", " aA ", "AaAA"], ["Freehold", "Farm", "Ranch"],
         10, 25,     0,  5,  5);
-    registerBuilding("Barn", "Barn", ["Field", "Barn", "Garden"],
+    registerBuilding("Barn", [" b  ", " bB ", "BbBB"], ["Field", "Barn", "Garden"],
         0,  5,      0,  2,  10);
-    registerBuilding("Inn", "Inn ", ["Flophouse", "Inn", "Hotel"],
+    registerBuilding("Inn", [" i  ", " iI ", "IiII"], ["Flophouse", "Inn", "Hotel"],
         5,  15,     5,  5,  3);
 
-    registerBuilding("Speakeasy", "Spk ", ["Dive Bar", "Speakeasy", "Club"],
+    registerBuilding("Speakeasy", [" e  ", " eE ", "EeEE"], ["Dive Bar", "Speakeasy", "Club"],
         0,  8,      1,  1,  1, false);
-    registerBuilding("Gambling Den", "Gamb", ["Dice Joint", "Gambling Den", "Casino"],
+    registerBuilding("Gambling Den", [" d  ", " dD ", "DdDD"], ["Dice Joint", "Gambling Den", "Casino"],
         0,  8,      1,  1,  1, false);
-    registerBuilding("House of Ill Repute", "Whor", ["Cathouse", "Brothel", "Massage Parlour"],
+    registerBuilding("House of Ill Repute", [" c  ", " cC ", "CcCC"], ["Cathouse", "Brothel", "Massage Parlour"],
         0,  15,     0,  1,  5, false);
 
     verifyBaseBuildings();

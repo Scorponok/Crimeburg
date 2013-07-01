@@ -286,8 +286,9 @@ var map = new function(global) {
 
     /* Render map array into string
     */
+    var horzRoadEdge = "+--------+  +--------+  +--------+  +--------+  +--------+  +--------+\n";
     function renderMap() {
-        var rendered = "";
+        var rendered = horzRoadEdge;
 
         /* Define array of empty arrays to hold map
         */
@@ -297,6 +298,7 @@ var map = new function(global) {
             }
 
         for (var i = 0; i < numRows; i++) {
+            rendered += "|";
             for (var j = 0; j < numCols; j++) {
                 var building = _buildings[i][j];
                 var baseBuilding = building.baseBuilding;
@@ -305,30 +307,31 @@ var map = new function(global) {
                 */
                 var style = "";
                 if (baseBuilding.isPolice) {
-                    style += "color: blue; ";
+                    style += "color: blue; font-weight: bolder;";
                     }
                 else if (!baseBuilding.isLegal) {
-                    style += "color: red; ";
-                    }
-                if (building.getRank() <= 1) {
-                    style += "font-weight: lighter; ";
-                    }
-                else if (building.getRank() >= 3) {
-                    style += "font-weight: bolder; ";
+                    style += "color: red; font-weight: bolder;";
                     }
 
                 /* Add the building to the map
                 */
                 map[i][j] = "<span id='" + getBuildingId(i, j) + "' title='???' style='" + style + "'"
                 map[i][j] += "onclick='map.showBuildingMenu(event, " + i + ", " + j + ");'>";
-                map[i][j] += baseBuilding.abbrev + "</span>";
+                map[i][j] += baseBuilding.abbrevForRank(building.getRank()) + "</span>";
 
-                rendered += map[i][j] + " "
+                rendered += map[i][j];
 
                 /* Vertical road!
                 */
                 if ((j + 1) % 2 == 0) {
-                    rendered += "  ";
+                    rendered += "|"
+
+                    /* Skip the starting segment of the next road if this is the
+                        last column
+                    */
+                    if (j != (numCols - 1)) {
+                        rendered += "  |";
+                        }
                     }
                 }
 
@@ -337,9 +340,10 @@ var map = new function(global) {
             /* Horizontal road!
             */
             if (i == 5) {
-                rendered += "\n";
+                rendered += horzRoadEdge + "\n" + horzRoadEdge;
                 }
             }
+        rendered += horzRoadEdge;
         updateMap(rendered);
         }
     renderMap();
