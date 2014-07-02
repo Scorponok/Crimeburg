@@ -96,7 +96,7 @@
         0,  15,     0,  5,  10);
 
     registerBuilding("House", [" ^  ", " ^^ ", "^^^^"], ["Slum", "House", "Mansion"],
-        5,  1,      61, 62, 46);
+        5,  2,      61, 62, 46);
     registerBuilding("Grocery Store", [" g  ", " gG ", "GgGG"], ["Fruit Stand", "Grocery", "Supermarket"],
         0,  8,      5,  3,  1);
     registerBuilding("Shop", [" s  ", " sS ", "SsSS"], ["Five-and-dime", "Shop", "Store"],

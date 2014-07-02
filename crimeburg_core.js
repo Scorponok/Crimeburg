@@ -54,3 +54,7 @@ function formatMoney(amount) {
 function reportError(text) {
     alert(text);
     }
+    
+function log(text) {
+    $("#log").prepend("<li>" + text + "</li>");
+    }

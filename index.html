@@ -8,13 +8,28 @@
 
 <body>
 
-<h1>Crimeburg - January 1919</h1>
+<h1>Crimeburg - <span id="date">January 1919</span></h1>
 
-<p>Your Money: <span id="money">money goes here</span></p>
+<div style="float: left; width: 300px; height: 500px; margin-right: 25px;">
+	<ol id="log" reversed>
+<!--
+		<li>first</li>
+		<li>second</li>
+		<li>third</li>-->
+		</ol>
+	</div>
+
+<p>Your Money: <strong><span id="money">money goes here</span></strong></p>
+
+<p><button id="nextmonth" onclick="game.nextMonth();">Wait Until Next Month</button> <button id="leavetown" onclick="game.leaveTown();" disabled>Leave Town</button></p>
 
 <pre id="map">map goes here</pre>
 
-<button onclick="game.nextMonth();">Next Month</button>
+<p id="penalty"></p>
+
+<p id="strikes"></p>
+
+<p id="rent"></p>
 
 <p>Demographics: <span id="population">population goes here</span></p>
 
@@ -23,8 +38,9 @@
   <div id="popup" style="position: absolute; left: 100px; top: 100px; border: solid black 1px; padding: 10px; background-color: white;">popup window contents go here</div>
   </div>
 
-<!-- Hosting your own jquery is for suckas -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+<!-- Hosting your own jquery is for suckas, but having a local copy is useful
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>-->
+<script src="jquery-2.1.1.min.js"></script>
 
 <!-- The actual game -->
 <script src="crimeburg_core.js"></script>

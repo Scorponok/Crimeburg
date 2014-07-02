@@ -7,9 +7,19 @@ var map = new function(global) {
     /* If you click on a building, this gets shown
     */
     this.showBuildingMenu = function(event, i, j) {
+    
+    		if (player.hasLost() || player.hasWon()) {
+    				return;
+    				}
 
         var popup = $("#popup");
         var overlay = $("#overlay");
+        
+        /* No robbing buildings if you're in jail
+        */
+        if (player.hasLost()) {
+        		return;
+        		}
 
         /* Build up the content we want to show in the popup
         */
@@ -57,12 +67,16 @@ var map = new function(global) {
         $("#map").html(text);
         }
 
-    function updatePopulation(living, employedLegal, employedIllegal, police) {
-        $("#population").text(living + " citizens, " + employedLegal + " legal jobs, " +
-                                employedIllegal + " illegal jobs, " + police + " police");
+    function updateDemographics(living, employedLegal, employedIllegal, police,
+    														averageFear, averageLevel) {
+        $("#population").html(living + " citizens, " + employedLegal + " legal jobs, " +
+                                employedIllegal + " illegal jobs, " + police + " police" +
+                                "<br>" +
+                                "average fear " + Math.round(averageFear) + "<br>" +
+                                "average level " + Math.round(averageLevel));
         }
 
-    updateMap("generating Crimeburg...");
+    updateMap("Building Crimeburg...");
 
 
     /* Define the streets and the classes of buildings on each
@@ -93,13 +107,6 @@ var map = new function(global) {
                                 streets[5], streets[5], streets[6]];
         })();
 
-
-    /* Keep track of various stats about Crimeburg
-    */
-    var _population = 0;
-    var _employedLegal = 0;
-    var _employedIllegal = 0;
-    var _police = 0;
 
     /* Create arrays to hold all the buildings
     */
@@ -268,20 +275,49 @@ var map = new function(global) {
 
                 setBuilding(i, j, baseBuilding, _streets_lookup[j].levelBonus);
                 }
-            var baseBuilding = _buildings[i][j].baseBuilding;
-
-            /* Add this building to our demographics
-            */
-            _population += baseBuilding.peopleLiving;
-            if (baseBuilding.isLegal)
-                _employedLegal += baseBuilding.peopleEmployed;
-            else
-                _employedIllegal += baseBuilding.peopleEmployed;
-            if (baseBuilding.isPolice) {
-                _police += baseBuilding.peopleEmployed;
-                }
             }
         }
+
+		/* Calculate how many people are employed in this building
+		*/
+		function calcAndUpdateDemographics() {
+
+			var population = 0;
+			var employedLegal = 0;
+			var employedIllegal = 0;
+			var police = 0;
+			var totalFear = 0;
+			var totalLevel = 0;
+			var fearCount = 0;
+
+			for (var i = 0; i < numRows; i++) {
+					for (var j = 0; j < numCols; j++) {
+							var baseBuilding = _buildings[i][j].baseBuilding;
+
+							/* Add this building to our demographics
+							*/
+							if (_buildings[i][j].fear != 0) {
+								totalFear += _buildings[i][j].fear;
+								fearCount++;
+								}
+							totalLevel += _buildings[i][j].level;
+							population += baseBuilding.peopleLiving;
+							if (baseBuilding.isLegal)
+									employedLegal += baseBuilding.peopleEmployed;
+							else
+									employedIllegal += baseBuilding.peopleEmployed;
+							if (baseBuilding.isPolice) {
+									police += baseBuilding.peopleEmployed;
+									}
+							}
+					}
+
+			/* Update population info based on building contents
+			*/
+			var averageFear = totalFear / (fearCount);
+			var averageLevel = totalLevel / (numRows * numCols);
+			updateDemographics(population, employedLegal, employedIllegal, police, averageFear, averageLevel);
+			}
 
 
     /* Render map array into string
@@ -355,8 +391,6 @@ var map = new function(global) {
     */
     calculateInitialBuildingStats();
     this.setBuildingTips();
-
-    /* Update population info based on building contents
-    */
-    updatePopulation(_population, _employedLegal, _employedIllegal, _police);
+    
+    calcAndUpdateDemographics();
     };
